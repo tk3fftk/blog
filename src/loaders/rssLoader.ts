@@ -1,7 +1,15 @@
 import { createHash } from 'node:crypto';
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, resolve } from 'node:path';
 import type { Loader } from 'astro/loaders';
 import Parser from 'rss-parser';
 import type { FeedConfig } from '../data/feeds';
+import type { UnifiedPost } from '../types/post';
+
+export interface RssLoaderOptions {
+  feeds: FeedConfig[];
+  snapshotFilePath?: string;
+}
 
 const parser = new Parser({
   timeout: 10000,
@@ -53,15 +61,41 @@ function generateEntryId(url: string, platform: string): string {
   return `${platform}-${hash}`;
 }
 
-export function rssLoader({ feeds }: { feeds: FeedConfig[] }): Loader {
+export function rssLoader(options: RssLoaderOptions): Loader {
+  const { feeds, snapshotFilePath = 'src/data/posts-snapshot.json' } = options;
+
   return {
     name: 'rss-feed-loader',
     load: async ({ store, logger, parseData, generateDigest }) => {
+      const snapshotPath = resolve(process.cwd(), snapshotFilePath);
+      const postMap = new Map<string, UnifiedPost>();
+
+      // 1. Load existing items from snapshot if available
+      try {
+        const rawSnapshot = await readFile(snapshotPath, 'utf-8');
+        const snapshotItems = JSON.parse(rawSnapshot) as UnifiedPost[];
+        for (const item of snapshotItems) {
+          postMap.set(item.id, {
+            ...item,
+            pubDate: new Date(item.pubDate),
+          });
+        }
+        logger.info(
+          `Loaded ${postMap.size} existing post(s) from snapshot (${snapshotFilePath}).`
+        );
+      } catch {
+        logger.info(
+          `No existing snapshot found at ${snapshotFilePath}. A new snapshot will be initialized.`
+        );
+      }
+
+      const initialCount = postMap.size;
+
+      // 2. Fetch all configured live feeds concurrently
       logger.info(
-        `Fetching RSS feeds from ${feeds.length} source(s) for tk3fftk...`
+        `Fetching live RSS feeds from ${feeds.length} source(s) for tk3fftk...`
       );
 
-      // Fetch all configured feeds concurrently
       const feedResults = await Promise.allSettled(
         feeds.map(async (feed) => {
           try {
@@ -82,8 +116,9 @@ export function rssLoader({ feeds }: { feeds: FeedConfig[] }): Loader {
         })
       );
 
-      let totalItems = 0;
+      let fetchedNewOrUpdatedCount = 0;
 
+      // 3. Merge live feed items into postMap
       for (const result of feedResults) {
         if (result.status === 'rejected') {
           continue;
@@ -106,7 +141,8 @@ export function rssLoader({ feeds }: { feeds: FeedConfig[] }): Loader {
             ? item.contentSnippet.replace(/\r?\n+/g, ' ').trim()
             : undefined;
 
-          const rawData = {
+          const postData: UnifiedPost = {
+            id,
             title: item.title.trim(),
             url: normalizedUrl,
             pubDate,
@@ -119,25 +155,61 @@ export function rssLoader({ feeds }: { feeds: FeedConfig[] }): Loader {
             faviconUrl: getFaviconUrl(normalizedUrl),
           };
 
-          const parsed = await parseData({
-            id,
-            data: rawData,
-          });
-
-          const digest = generateDigest(parsed);
-
-          store.set({
-            id,
-            data: parsed,
-            digest,
-          });
-
-          totalItems++;
+          const existing = postMap.get(id);
+          if (!existing) {
+            postMap.set(id, postData);
+            fetchedNewOrUpdatedCount++;
+          } else {
+            // Update title or snippet if changed
+            if (
+              existing.title !== postData.title ||
+              existing.contentSnippet !== postData.contentSnippet
+            ) {
+              postMap.set(id, { ...existing, ...postData });
+              fetchedNewOrUpdatedCount++;
+            }
+          }
         }
       }
 
+      const allPosts = Array.from(postMap.values()).sort(
+        (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+      );
+
+      // 4. Save updated snapshot if new items or updates occurred, or snapshot did not exist
+      if (fetchedNewOrUpdatedCount > 0 || initialCount === 0) {
+        try {
+          await mkdir(dirname(snapshotPath), { recursive: true });
+          const serializedSnapshot = JSON.stringify(allPosts, null, 2) + '\n';
+          await writeFile(snapshotPath, serializedSnapshot, 'utf-8');
+          logger.info(
+            `Saved ${allPosts.length} post(s) to snapshot (${snapshotFilePath}).`
+          );
+        } catch (err) {
+          logger.warn(
+            `Failed to save snapshot file at ${snapshotPath}: ${err instanceof Error ? err.message : String(err)}`
+          );
+        }
+      }
+
+      // 5. Store all merged posts in Astro Content Layer Data Store
+      for (const post of allPosts) {
+        const parsed = await parseData({
+          id: post.id,
+          data: post as unknown as Record<string, unknown>,
+        });
+
+        const digest = generateDigest(parsed);
+
+        store.set({
+          id: post.id,
+          data: parsed,
+          digest,
+        });
+      }
+
       logger.info(
-        `Successfully loaded ${totalItems} external post(s) into Content Layer.`
+        `Successfully loaded ${allPosts.length} total external post(s) (Live + Snapshot) into Content Layer.`
       );
     },
   };

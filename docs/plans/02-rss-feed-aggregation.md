@@ -61,15 +61,70 @@ flowchart TD
 
 ## 確定した設計方針 & 決定事項 (Confirmed Decisions)
 
-| 項目 | 決定内容 | 理由・背景 |
-| :--- | :--- | :--- |
-| **コレクション構成** | `externalArticles` コレクションとして独立定義 | Content Layer の責務を分離し、将来の自作ブログ（`blog` コレクション）や手動寄稿記事と疎結合に保つため。 |
-| **統一データ型** | `UnifiedPost` インターフェース（`src/types/post.ts`）に準拠 | 将来の統合タイムライン機能実装時にスキーマ再設計の手間を省くため。 |
-| **メディア種別** | `contentType: 'article' \| 'slide'` メタデータを保持 | Speaker Deck（スライド）と通常の技術記事をUI・フィルターで識別可能にするため。 |
-| **スナップショット永続化** | `src/data/posts-snapshot.json` に累加保存 | RSS配信上限（最新10〜30件）により過去記事が消えるのを防ぎ、永続的に全履歴を保持するため。 |
-| **エラーハンドリング** | 個別フィード失敗時はスナップショットを維持して継続 | 外部サービスの障害やオフライン環境でも既存スナップショットを用いてビルドを継続するため。 |
-| **ID生成・重複排除** | URL正規化（クエリ削除）＋ハッシュ生成で一意な `id` を作成 | キャッシュキーの安定化および追跡パラメータによる重複登録を防止するため。 |
-| **日付処理・表示** | Zod `z.coerce.date()` + `Intl.DateTimeFormat` (Asia/Tokyo, `YYYY-MM-DD`) | 外部依存（Day.js等）を増やさず、JSTでの一貫した日付検証・表示を行うため。 |
+| 項目                       | 決定内容                                                                 | 理由・背景                                                                                              |
+| :------------------------- | :----------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------ |
+| **コレクション構成**       | `externalArticles` コレクションとして独立定義                            | Content Layer の責務を分離し、将来の自作ブログ（`blog` コレクション）や手動寄稿記事と疎結合に保つため。 |
+| **統一データ型**           | `UnifiedPost` インターフェース（`src/types/post.ts`）に準拠              | 将来の統合タイムライン機能実装時にスキーマ再設計の手間を省くため。                                      |
+| **メディア種別**           | `contentType: 'article' \| 'slide'` メタデータを保持                     | Speaker Deck（スライド）と通常の技術記事をUI・フィルターで識別可能にするため。                          |
+| **スナップショット永続化** | `src/data/posts-snapshot.json` に累加保存                                | RSS配信上限（最新10〜30件）により過去記事が消えるのを防ぎ、永続的に全履歴を保持するため。               |
+| **エラーハンドリング**     | 個別フィード失敗時はスナップショットを維持して継続                       | 外部サービスの障害やオフライン環境でも既存スナップショットを用いてビルドを継続するため。                |
+| **ID生成・重複排除**       | URL正規化（クエリ削除）＋ハッシュ生成で一意な `id` を作成                | キャッシュキーの安定化および追跡パラメータによる重複登録を防止するため。                                |
+| **日付処理・表示**         | Zod `z.coerce.date()` + `Intl.DateTimeFormat` (Asia/Tokyo, `YYYY-MM-DD`) | 外部依存（Day.js等）を増やさず、JSTでの一貫した日付検証・表示を行うため。                               |
+
+---
+
+## スナップショット JSON フォーマット定義 (`src/data/posts-snapshot.json`)
+
+`UnifiedPost` 型に 1:1 で対応したプレーンな JSON 配列です。Git の差分（diff）が見やすくなるようインデント付きで保存されます。
+
+### フィールド仕様
+
+| フィールド名     | 型       | 必須 | 説明                                         | 例                                                          |
+| :--------------- | :------- | :--- | :------------------------------------------- | :---------------------------------------------------------- |
+| `id`             | `string` | ✅   | プラットフォーム名 + URLハッシュ（一意キー） | `"zenn-45d53de5c6e1252b"`                                   |
+| `title`          | `string` | ✅   | 記事 / スライドのタイトル                    | `"NAT GWを使えないおれたちのための..."`                     |
+| `url`            | `string` | ✅   | 追跡パラメータ等を除去した正規化URL          | `"https://zenn.dev/primenumber/articles/b9dc8fb2f1f7ea"`    |
+| `pubDate`        | `string` | ✅   | ISO 8601形式の投稿日時                       | `"2026-08-13T07:14:24.000Z"`                                |
+| `contentSnippet` | `string` | -    | 概要テキスト（改行除去・先頭200文字）        | `"この記事では、私たちのように、AWSを利用しており..."`      |
+| `postType`       | `string` | ✅   | コンテンツ供給元種別（常に `"external"`）    | `"external"`                                                |
+| `contentType`    | `string` | ✅   | メディア種別（`"article"` または `"slide"`） | `"article"`                                                 |
+| `platform`       | `string` | ✅   | プラットフォーム識別子                       | `"zenn"`, `"note"`, `"qiita"`, `"speakerdeck"`              |
+| `sourceName`     | `string` | ✅   | 表示用サイト名                               | `"Zenn"`, `"note"`, `"Qiita"`, `"Speaker Deck"`             |
+| `sourceUrl`      | `string` | -    | ユーザーのプロフィールURL                    | `"https://zenn.dev/tk3fftk"`                                |
+| `faviconUrl`     | `string` | -    | Google Favicon API のアイコンURL             | `"https://www.google.com/s2/favicons?sz=32&domain_url=..."` |
+
+### JSON サンプル
+
+```json
+[
+  {
+    "id": "zenn-45d53de5c6e1252b",
+    "title": "NAT GWを使えないおれたちのための、NATインスタンス冗長化パターン3選",
+    "url": "https://zenn.dev/primenumber/articles/b9dc8fb2f1f7ea",
+    "pubDate": "2026-08-13T07:14:24.000Z",
+    "contentSnippet": "この記事では、私たちのように、AWSを利用しており、何らかの理由でNAT Gateway(以下NAT GW)を利用できずNATインスタンスを利用している環境において、NATインスタンス運用時に大きな課題となる「NATインスタンスが単一障害点になる」問題の改善案を3パターン提案します。",
+    "postType": "external",
+    "contentType": "article",
+    "platform": "zenn",
+    "sourceName": "Zenn",
+    "sourceUrl": "https://zenn.dev/tk3fftk",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fzenn.dev"
+  },
+  {
+    "id": "speakerdeck-dc80a221a32dc621",
+    "title": "Claude Team Plan導入・ガイド",
+    "url": "https://speakerdeck.com/tk3fftk/claude-team-plandao-ru-gaido",
+    "pubDate": "2026-07-12T04:00:00.000Z",
+    "contentSnippet": "CCoE実践者コミュニティ関西 #9 - connpass https://ccoekansai.connpass.com/event/396837/",
+    "postType": "external",
+    "contentType": "slide",
+    "platform": "speakerdeck",
+    "sourceName": "Speaker Deck",
+    "sourceUrl": "https://speakerdeck.com/tk3fftk",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fspeakerdeck.com"
+  }
+]
+```
 
 ---
 
@@ -84,31 +139,15 @@ flowchart TD
 ### 2. データ型定義・フィード設定・スナップショット
 
 #### [NEW] `src/types/post.ts`
-- 共通インターフェース `UnifiedPost` を定義。
-```typescript
-export type PostContentType = 'article' | 'slide';
-export type PostSourceType = 'external' | 'blog' | 'manual';
-export type PlatformType = 'zenn' | 'note' | 'qiita' | 'speakerdeck' | 'custom';
 
-export interface UnifiedPost {
-  id: string;
-  title: string;
-  url: string;
-  pubDate: Date | string;
-  contentSnippet?: string;
-  postType: PostSourceType;
-  contentType: PostContentType;
-  platform: PlatformType;
-  sourceName: string;
-  sourceUrl?: string;
-  faviconUrl?: string;
-}
-```
+- 共通インターフェース `UnifiedPost` を定義。
 
 #### [NEW] `src/data/feeds.ts`
+
 - `tk3fftk` のRSSフィード設定（Zenn, note, Qiita, Speaker Deck）を定義。
 
 #### [NEW] `src/data/posts-snapshot.json`
+
 - 取得済み全記事データを Git 上に保持するスナップショットファイル。
 - 過去に取得された記事が RSS から消えてもここに残り続けます。
 
@@ -117,6 +156,7 @@ export interface UnifiedPost {
 ### 3. Astro Content Layer Loader & Collection 設定
 
 #### [MODIFY] `src/loaders/rssLoader.ts`
+
 - スナップショット連動型のカスタム RSS ローダー:
   1. `src/data/posts-snapshot.json` が存在すれば読み込み、初期エントリーマップを作成。
   2. 外部フィード（4ソース）を並列取得。
@@ -125,6 +165,7 @@ export interface UnifiedPost {
   5. マージ済みの全記事（スナップショット＋最新）を Astro Data Store に `store.set()` で登録。
 
 #### [NEW] `src/content.config.ts`
+
 - `externalArticles` コレクションの定義と Zod スキーマバリデーション。
 
 ---
@@ -132,6 +173,7 @@ export interface UnifiedPost {
 ### 4. 仮UI・一覧レンダリングコンポーネント
 
 #### [NEW] `src/components/PostCard.astro`
+
 - 仮デザインの記事カードコンポーネント:
   - タイトル（外部リンク）
   - 出典プラットフォーム名 ＆ ファビコン
@@ -140,6 +182,7 @@ export interface UnifiedPost {
   - スニペット（概要テキスト）
 
 #### [MODIFY] `src/pages/index.astro`
+
 - `getCollection('externalArticles')` で取得した記事一覧を `pubDate` の降順（新しい順）にソートしてレンダリング。
 - 記事数・スライド数のサマリーバッジを表示。
 
@@ -148,10 +191,12 @@ export interface UnifiedPost {
 ## 検証手順 (Verification Plan)
 
 ### 自動テスト / 静的チェック
+
 1. **型チェック**: `npm run check` (`tsc --noEmit`) がエラーなく完了すること。
 2. **Linter / Formatter**: `npm run lint` および `npm run format:check` を実行し、コード品質基準をパスすること。
 3. **ビルドテスト**: `npm run build` を実行し、Astro Content Layer が正常に外部RSSとスナップショットをマージして静的HTMLを生成できること。
 
 ### スナップショット動作検証
+
 1. `src/data/posts-snapshot.json` が正常に生成・更新されることを確認。
 2. オフライン時または個別フィードの一時障害時でも、スナップショットデータをもとに全記事が欠落せずレンダリングされることを確認。
