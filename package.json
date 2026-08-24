@@ -17,7 +17,7 @@
     "format:check": "prettier --check .",
     "generate-types": "wrangler types",
     "wrangler:dev": "astro build && wrangler dev --local",
-    "wrangler:publish": "astro build && wrangler deploy",
+    "wrangler:deploy": "astro build && wrangler deploy",
     "wrangler:versions-upload": "wrangler versions upload"
   },
   "dependencies": {
