@@ -1,0 +1,95 @@
+---
+import PostCard from './PostCard.astro';
+
+/**
+ * @typedef {import('astro:content').CollectionEntry<'externalArticles'>} PostEntry
+ */
+
+/**
+ * @type {{
+ *   posts: PostEntry[];
+ *   initialCount?: number;
+ *   incrementCount?: number;
+ * }}
+ */
+const { posts, initialCount = 24, incrementCount = 24 } = Astro.props;
+const hasMore = posts.length > initialCount;
+---
+
+<div class="post-list-wrapper" data-increment={incrementCount}>
+  {
+    posts.length === 0 ? (
+      <div class="py-20 text-center text-lg font-medium text-[#d4e7f1]/60">
+        No posts yet
+      </div>
+    ) : (
+      <>
+        <div
+          class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3"
+          id="post-grid"
+        >
+          {posts.map((post, index) => (
+            <div
+              class:list={[
+                'post-card-item flex h-full flex-col',
+                { hidden: index >= initialCount },
+              ]}
+              data-index={index}
+            >
+              <PostCard post={post} />
+            </div>
+          ))}
+        </div>
+
+        {hasMore && (
+          <div class="mt-12 text-center" id="load-more-container">
+            <button
+              type="button"
+              id="load-more-button"
+              class="rounded-full border border-[#737d82]/40 px-8 py-3 text-sm font-medium text-[#d4e7f1] transition-all hover:bg-[#24242d] hover:text-white focus:outline-none"
+            >
+              LOAD MORE
+            </button>
+          </div>
+        )}
+      </>
+    )
+  }
+</div>
+
+<script>
+  function setupLoadMore() {
+    const wrapper = document.querySelector('.post-list-wrapper');
+    if (!wrapper) return;
+
+    const increment = Number(wrapper.getAttribute('data-increment') || '24');
+    const button = document.getElementById('load-more-button');
+    const container = document.getElementById('load-more-container');
+    const hiddenItems = Array.from(
+      document.querySelectorAll('.post-card-item.hidden')
+    );
+
+    if (!button || hiddenItems.length === 0) return;
+
+    button.addEventListener('click', () => {
+      const currentHidden = Array.from(
+        document.querySelectorAll('.post-card-item.hidden')
+      );
+      const toShow = currentHidden.slice(0, increment);
+
+      toShow.forEach((el) => {
+        el.classList.remove('hidden');
+      });
+
+      if (currentHidden.length <= increment) {
+        if (container) {
+          container.style.display = 'none';
+        }
+      }
+    });
+  }
+
+  // Support both standard load and Astro view transitions if used
+  document.addEventListener('DOMContentLoaded', setupLoadMore);
+  document.addEventListener('astro:page-load', setupLoadMore);
+</script>
