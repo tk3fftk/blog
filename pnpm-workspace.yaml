@@ -5,3 +5,5 @@ allowBuilds:
 minimumReleaseAge: 4320 # 3 days in minutes
 minimumReleaseAgeExclude:
   - eslint@10.9.0
+packages:
+  - '.'
