@@ -1,0 +1,90 @@
+---
+/**
+ * @typedef {import('astro:content').CollectionEntry<'externalArticles'>} PostEntry
+ */
+
+/** @type {{ post: PostEntry }} */
+const { post } = Astro.props;
+const { title, url, pubDate, contentSnippet, sourceName, faviconUrl } =
+  post.data;
+
+const formattedDate = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  timeZone: 'Asia/Tokyo',
+})
+  .format(pubDate)
+  .replace(/\//g, '-');
+
+// Check if the article was published in the last 3 days
+const isNew = Date.now() - new Date(pubDate).getTime() < 86400000 * 3;
+
+// Extract domain from URL
+let displayDomain = sourceName;
+try {
+  const parsed = new URL(url);
+  displayDomain = parsed.hostname;
+} catch {
+  // fallback to sourceName
+}
+---
+
+<article
+  class="group relative flex h-full flex-col justify-between rounded-xl border border-[#737d82]/20 bg-[#24242d] p-5 transition-all duration-200 hover:-translate-y-1 hover:border-slate-600/50 hover:shadow-xl"
+>
+  {
+    isNew && (
+      <div class="absolute -top-1.5 -right-1.5 rounded-lg bg-[#9060ff] px-2 py-0.5 text-[10px] font-bold tracking-wider text-white shadow-md">
+        NEW
+      </div>
+    )
+  }
+
+  <div class="flex flex-1 flex-col">
+    <div
+      class="mb-3 flex items-center justify-between gap-2 text-xs text-[#d4e7f1]/60"
+    >
+      <div class="flex min-w-0 items-center gap-1.5">
+        {
+          faviconUrl ? (
+            <img
+              src={faviconUrl}
+              alt=""
+              width="14"
+              height="14"
+              class="h-3.5 w-3.5 flex-shrink-0 rounded-sm"
+              loading="lazy"
+            />
+          ) : null
+        }
+        <span class="truncate font-medium text-[#d4e7f1]/80"
+          >{displayDomain}</span
+        >
+      </div>
+      <time datetime={pubDate.toISOString()} class="flex-shrink-0 font-mono">
+        {formattedDate}
+      </time>
+    </div>
+
+    <h2
+      class="line-clamp-2 min-h-[42px] text-[15px] leading-snug font-medium text-white transition-colors group-hover:text-[#b494ff]"
+    >
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="focus:outline-none"
+      >
+        <span class="absolute inset-0" aria-hidden="true"></span>
+        {title}
+      </a>
+    </h2>
+
+    <p
+      class="mt-3 line-clamp-2 min-h-[32px] text-xs leading-relaxed text-[#d4e7f1]/60"
+    >
+      {contentSnippet || ''}
+    </p>
+  </div>
+</article>

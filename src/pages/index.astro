@@ -1,17 +1,46 @@
 ---
+import { getCollection } from 'astro:content';
+import SiteHeader from '../components/SiteHeader.astro';
+import ProfileHeader from '../components/ProfileHeader.astro';
+import PostList from '../components/PostList.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import { siteConfig } from '../config/site';
+import '../styles/global.css';
 
+const posts = await getCollection('externalArticles');
+posts.sort(
+  (a, b) =>
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+);
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
+<html lang="ja" class="dark min-h-screen bg-[#111111] text-[#ffffff]">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{siteConfig.author.name} | {siteConfig.siteTitle}</title>
+    <meta name="description" content={siteConfig.siteDescription} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    />
+  </head>
+  <body class="flex min-h-screen flex-col bg-[#111111] text-white antialiased">
+    <SiteHeader />
+
+    <main class="mx-auto w-full max-w-6xl flex-1 px-4">
+      <ProfileHeader />
+
+      <div class="mb-6 border-t border-[#737d82]/30 pt-8">
+        <PostList posts={posts} initialCount={24} incrementCount={24} />
+      </div>
+    </main>
+
+    <SiteFooter />
+  </body>
 </html>
