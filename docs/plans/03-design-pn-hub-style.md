@@ -45,17 +45,30 @@ graph TD
     LoadMore --> Footer
 ```
 
-### デザイントークン一覧
+### デザイントークン & フォント設定
 
-| トークン名                        | カラーコード / 値          | 用途                                       |
-| :-------------------------------- | :------------------------- | :----------------------------------------- |
-| `--color-base-background`         | `#111111`                  | サイト全体の基本背景色                     |
-| `--color-base-background-lighter` | `#24242d`                  | カード背景・SNSボタン・LOAD MOREボタン背景 |
-| `--color-base-text`               | `#ffffff`                  | メインテキスト・タイトル                   |
-| `--color-base-text-lighter`       | `rgba(212, 231, 241, 0.6)` | サブテキスト・日付・スニペット             |
-| `--color-border`                  | `rgba(115, 125, 130, 0.4)` | 区切り線・カード境界・ボタン境界           |
-| `--color-primary-background`      | `#9060ff`                  | NEW バッジ背景・アクセント                 |
-| `--color-primary-text`            | `#b494ff`                  | ホバー時のタイトルリンク色                 |
+`pN-blog-hub` の Google Fonts (`Noto Sans JP`)、SCSS 変数およびカラーパレットを踏襲したトークン設計です。
+
+| トークン名                        | カラーコード / 値                                               | 用途                                       |
+| :-------------------------------- | :-------------------------------------------------------------- | :----------------------------------------- |
+| **フォントファミリー**            | `"Noto Sans JP", -apple-system, BlinkMacSystemFont, sans-serif` | サイト全域のフォント                       |
+| `--color-base-background`         | `#111111`                                                       | サイト全体の基本背景色                     |
+| `--color-base-background-lighter` | `#24242d`                                                       | カード背景・SNSボタン・LOAD MOREボタン背景 |
+| `--color-base-text`               | `#ffffff`                                                       | メインテキスト・タイトル                   |
+| `--color-base-text-lighter`       | `rgba(212, 231, 241, 0.6)`                                      | サブテキスト・日付・スニペット             |
+| `--color-border`                  | `rgba(115, 125, 130, 0.4)`                                      | 区切り線・カード境界・ボタン境界           |
+| `--color-primary-background`      | `#9060ff`                                                       | NEW バッジ背景・アクセント                 |
+| `--color-primary-text`            | `#b494ff`                                                       | ホバー時のタイトルリンク色                 |
+
+### タイポグラフィサイズ仕様
+
+- **ページタイトル / ヘッダーロゴ**: `text-2xl font-bold` (24px)
+- **プロフィール名**: `text-2xl sm:text-3xl font-bold` (28~30px)
+- **プロフィールBio**: `text-[15px] sm:text-base` (15~16px)
+- **記事カードタイトル**: `text-[17px] font-medium min-h-[48px]` (~1.1rem)
+- **記事カードスニペット**: `text-[13.5px] min-h-[38px] leading-relaxed`
+- **記事カードメタ（ドメイン・日付）**: `text-[13px]`
+- **LOAD MORE ボタン**: `text-base px-9 py-3.5`
 
 ---
 
