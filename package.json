@@ -14,9 +14,14 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "generate-types": "wrangler types",
+    "wrangler:dev": "astro build && wrangler dev --local",
+    "wrangler:deploy": "astro build && wrangler deploy",
+    "wrangler:versions-upload": "wrangler versions upload"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^14.2.3",
     "astro": "^7.2.4",
     "rss-parser": "^3.13.0"
   },
@@ -31,6 +36,7 @@
     "prettier-plugin-astro": "^0.14.1",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4.3.3",
-    "typescript": "^7.0.2"
+    "typescript": "^7.0.2",
+    "wrangler": "^4.125.0"
   }
 }
