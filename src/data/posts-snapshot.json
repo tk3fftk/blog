@@ -234,6 +234,19 @@
     "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fzenn.dev"
   },
   {
+    "id": "custom-b476c77eed5b9634",
+    "title": "バラバラだった登壇資料をAIで一つの知識ベースに。NotebookLMでSRE NEXT 2025を120%活用する方法",
+    "url": "https://sre-magazine.net/articles/9/tk3fftk/",
+    "pubDate": "2025-08-01T00:00:00.000Z",
+    "contentSnippet": "2行まとめ SRE NEXT 2025 - NotebookLMを触ってみてください📔 AIやオンライン配信で補完できるとはいえ、「その場でしか得られないもの」も多くあるはずなので、行く価値があると思ったら身銭を切ってでも参加しましょう🚀 はじめに 株式会社primeNumberでSREやEM、たまにセキュリティに関することをやっている高塚(@tk3fftk)です。 SRE NEXT 202…",
+    "postType": "manual",
+    "contentType": "article",
+    "platform": "custom",
+    "sourceName": "sre-magazine.net",
+    "sourceUrl": "https://sre-magazine.net",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fsre-magazine.net"
+  },
+  {
     "id": "note-24f27ddc03dc998d",
     "title": "「第12回 荻窪で積読を消化したい」で紹介されたり言及のあった本まとめ",
     "url": "https://note.com/tk3fftk/n/n1f61c09abb94",
@@ -364,6 +377,32 @@
     "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fzenn.dev"
   },
   {
+    "id": "custom-a663307b0680d614",
+    "title": "オフィスでもできる！ 心が整う“心の筋トレ”マインドフルネス体験会をエンジニア主導で開催しました - primeNumber’s Owned Media",
+    "url": "https://lounge.primenumber.com/entry/n/n9538986c78a1",
+    "pubDate": "2024-12-19T02:41:03.000Z",
+    "contentSnippet": "こんにちは、primeNumberです！ primeNumberのオフィスには人工芝を敷いたエリアや掘りごたつなどが用意されたオープンスペースがあり、月に1回の社内飲み会「TGIF」のほかにも、読書会や勉強会などの自主イベントが開催されています。こうした自主イベントは、人事をはじめとする役職や部門にこだわらず、さまざまなメンバーが企画しています。 そんな自主イベントとして定期的に開催されているの…",
+    "postType": "manual",
+    "contentType": "article",
+    "platform": "custom",
+    "sourceName": "lounge.primenumber.com",
+    "sourceUrl": "https://lounge.primenumber.com",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Flounge.primenumber.com"
+  },
+  {
+    "id": "custom-7f969305590fa701",
+    "title": "TROCCO/COMETAのモニタリングに適材適所で活用するNew Relic",
+    "url": "https://findy-tools.io/products/new-relic/4/350",
+    "pubDate": "2024-12-19T00:00:00.000Z",
+    "contentSnippet": "株式会社primeNumberのNew Relicのレビューです。導入に至った背景や導入検討時の悩み、実際に導入してから感じたNew Relicのメリットと課題感を導入効果とともにレビューしていただきました。",
+    "postType": "manual",
+    "contentType": "article",
+    "platform": "custom",
+    "sourceName": "findy-tools.io",
+    "sourceUrl": "https://findy-tools.io",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Ffindy-tools.io"
+  },
+  {
     "id": "zenn-99e45509149c8c5d",
     "title": "IAM Identity CenterのGoogle Workspace連携における制限をTerraformでいい感じに管理する",
     "url": "https://zenn.dev/primenumber/articles/5baf0d2228d351",
@@ -388,6 +427,19 @@
     "sourceName": "Speaker Deck",
     "sourceUrl": "https://speakerdeck.com/tk3fftk",
     "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fspeakerdeck.com"
+  },
+  {
+    "id": "custom-7db59658c943e7a5",
+    "title": "仕組み化とドキュメンテーションで CTO の1人 \"Always On-Call\" 状態をなんとかする",
+    "url": "https://sre-magazine.net/articles/5/tk3fftk/",
+    "pubDate": "2024-10-01T00:00:00.000Z",
+    "contentSnippet": "はじめに 株式会社primeNumber で データマネジメントを支援するSaaS TROCCO と COMETA の SRE をやっている髙塚 (@tk3fftk) です。 SRE Magazine 第5号はインシデントとか On-Call ネタが多そうな雰囲気を感じたので乗っかって On-Call 改善ネタを書いてみます。 TL;DR CTO の1人 Always On-Call 状態をなん…",
+    "postType": "manual",
+    "contentType": "article",
+    "platform": "custom",
+    "sourceName": "sre-magazine.net",
+    "sourceUrl": "https://sre-magazine.net",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fsre-magazine.net"
   },
   {
     "id": "speakerdeck-e16aefb1fc65ed5d",
@@ -582,6 +634,19 @@
     "sourceName": "Qiita",
     "sourceUrl": "https://qiita.com/tk3fftk",
     "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fqiita.com"
+  },
+  {
+    "id": "custom-22b4ad5428fc6a5c",
+    "title": "cdCon 2020: Case Study: How Yahoo! JAPAN Uses and Co...",
+    "url": "https://cdcon2020.sched.com/event/dpvl/case-study-how-yahoo-japan-uses-and-contributes-to-screwdriver-at-scale-hiroki-takatsuka-jithin-emmanuel-yahoo-japan",
+    "pubDate": "2020-10-07T00:00:00.000Z",
+    "contentSnippet": "View more about this event at cdCon 2020",
+    "postType": "manual",
+    "contentType": "slide",
+    "platform": "custom",
+    "sourceName": "cdcon2020.sched.com",
+    "sourceUrl": "https://cdcon2020.sched.com",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fcdcon2020.sched.com"
   },
   {
     "id": "qiita-98e742281f4c3c09",
