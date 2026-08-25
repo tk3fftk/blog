@@ -26,6 +26,7 @@
     "rss-parser": "^3.13.0"
   },
   "devDependencies": {
+    "@astrojs/markdown-remark": "^7.2.4",
     "@astrojs/tailwind": "^6.0.2",
     "@tailwindcss/vite": "^4.3.3",
     "@types/node": "^26.2.0",
