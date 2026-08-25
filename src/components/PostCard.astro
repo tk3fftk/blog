@@ -1,8 +1,7 @@
 ---
 /** @type {{ post: import('../types/post').UnifiedPost }} */
 const { post } = Astro.props;
-const { title, url, pubDate, contentSnippet, sourceName, faviconUrl } =
-  post;
+const { title, url, pubDate, contentSnippet, sourceName, faviconUrl } = post;
 
 const formattedDate = new Intl.DateTimeFormat('ja-JP', {
   year: 'numeric',
