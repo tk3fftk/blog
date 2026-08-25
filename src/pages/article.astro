@@ -1,0 +1,19 @@
+---
+import { getCollection } from 'astro:content';
+import PostListPage from '../components/PostListPage.astro';
+import { createUnifiedPosts } from '../utils/posts';
+
+const [externalArticles, diaryEntries] = await Promise.all([
+  getCollection('externalArticles'),
+  getCollection('diary'),
+]);
+const posts = createUnifiedPosts(externalArticles, diaryEntries).filter(
+  (post) => post.contentType === 'article'
+);
+---
+
+<PostListPage
+  title="Article"
+  description="External articles by Hiroki Takatsuka"
+  posts={posts}
+/>

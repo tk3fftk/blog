@@ -1,11 +1,19 @@
 ---
 import { siteConfig } from '../config/site';
+
+const navigationItems = [
+  { href: '/article', label: 'Article' },
+  { href: '/slide', label: 'Slide' },
+  { href: '/diary', label: 'Diary' },
+  { href: '/profile', label: 'Profile' },
+];
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
 ---
 
 <header
   class="sticky top-0 z-50 border-b border-[#737d82]/20 bg-[#111111]/90 backdrop-blur-md"
 >
-  <div class="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+  <div class="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4">
     <a
       href="/"
       class="text-xl font-bold tracking-tight text-white transition-colors hover:text-[#b494ff]"
@@ -13,7 +21,35 @@ import { siteConfig } from '../config/site';
       {siteConfig.siteTitle}
     </a>
 
-    <div class="flex items-center gap-4">
+    <nav
+      class="min-w-0 flex-1 [scrollbar-width:none] overflow-x-auto [&::-webkit-scrollbar]:hidden"
+      aria-label="Main navigation"
+    >
+      <ul class="flex w-max items-center gap-4 text-sm font-medium sm:gap-5">
+        {
+          navigationItems.map(({ href, label }) => {
+            const isCurrentPage = currentPath === href;
+
+            return (
+              <li>
+                <a
+                  href={href}
+                  aria-current={isCurrentPage ? 'page' : undefined}
+                  class:list={[
+                    'transition-colors hover:text-white',
+                    isCurrentPage ? 'text-[#b494ff]' : 'text-[#d4e7f1]/70',
+                  ]}
+                >
+                  {label}
+                </a>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </nav>
+
+    <div class="flex flex-shrink-0 items-center">
       {
         siteConfig.socialLinks.github_repo && (
           <a
