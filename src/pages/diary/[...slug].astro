@@ -60,7 +60,7 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
           <p class="mt-5 text-[#d4e7f1]/75">{post.data.description}</p>
         </header>
 
-        <div class="diary-content pt-10">
+        <div class="diary-content">
           <Content />
         </div>
       </article>
@@ -72,14 +72,20 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
 
 <style>
   .diary-content :global(h2) {
-    margin-top: 2.5rem;
+    margin-top: 1.5rem;
     font-size: 1.5rem;
     font-weight: 700;
   }
 
   .diary-content :global(h3) {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .diary-content :global(h4) {
+    margin-top: 1rem;
+    font-size: 1.1rem;
     font-weight: 700;
   }
 
