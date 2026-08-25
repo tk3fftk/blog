@@ -2,12 +2,8 @@
 import PostCard from './PostCard.astro';
 
 /**
- * @typedef {import('astro:content').CollectionEntry<'externalArticles'>} PostEntry
- */
-
-/**
  * @type {{
- *   posts: PostEntry[];
+ *   posts: import('../types/post').UnifiedPost[];
  *   initialCount?: number;
  *   incrementCount?: number;
  * }}

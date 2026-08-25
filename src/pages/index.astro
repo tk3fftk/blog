@@ -7,10 +7,33 @@ import SiteFooter from '../components/SiteFooter.astro';
 import { siteConfig } from '../config/site';
 import '../styles/global.css';
 
-const posts = await getCollection('externalArticles');
+const [externalArticles, diaryEntries] = await Promise.all([
+  getCollection('externalArticles'),
+  getCollection('diary'),
+]);
+
+/** @type {import('../types/post').UnifiedPost[]} */
+const diaryPosts = diaryEntries.map(({ id, data }) => ({
+  id: `diary-${id}`,
+  title: data.title,
+  url: `/diary/${id}`,
+  pubDate: data.pubDate,
+  contentSnippet: data.description,
+  postType: 'diary',
+  contentType: 'diary',
+  platform: 'custom',
+  sourceName: 'diary',
+  faviconUrl: '/favicon.svg',
+}));
+
+/** @type {import('../types/post').UnifiedPost[]} */
+const posts = [
+  ...externalArticles.map(({ id, data }) => ({ id, ...data })),
+  ...diaryPosts,
+];
+
 posts.sort(
-  (a, b) =>
-    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
+  (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
 );
 ---
 

@@ -1,5 +1,6 @@
-export type PostContentType = 'article' | 'slide';
-export type PostSourceType = 'external' | 'blog' | 'manual';
+export type PostContentType = 'diary' | 'article' | 'slide';
+export type ExternalContentType = Exclude<PostContentType, 'diary'>;
+export type PostSourceType = 'external' | 'diary' | 'manual';
 export type PlatformType = 'zenn' | 'note' | 'qiita' | 'speakerdeck' | 'custom';
 
 export interface UnifiedPost {

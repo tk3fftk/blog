@@ -1,0 +1,189 @@
+---
+import { getCollection, render } from 'astro:content';
+import SiteFooter from '../../components/SiteFooter.astro';
+import SiteHeader from '../../components/SiteHeader.astro';
+import { siteConfig } from '../../config/site';
+import '../../styles/global.css';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('diary');
+
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const formattedDate = new Intl.DateTimeFormat('ja-JP', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+  timeZone: 'Asia/Tokyo',
+})
+  .format(post.data.pubDate)
+  .replace(/\//g, '-');
+---
+
+<html lang="ja" class="dark min-h-screen bg-[#111111] text-[#ffffff]">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{post.data.title} | {siteConfig.siteTitle}</title>
+    <meta name="description" content={post.data.description} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+    />
+  </head>
+  <body class="flex min-h-screen flex-col bg-[#111111] text-white antialiased">
+    <SiteHeader />
+
+    <main class="mx-auto w-full max-w-3xl flex-1 px-4 py-12 sm:py-16">
+      <article>
+        <header class="border-b border-[#737d82]/30 pb-8">
+          <h1 class="text-3xl leading-tight font-bold sm:text-4xl">
+            {post.data.title}
+          </h1>
+          <time
+            datetime={post.data.pubDate.toISOString()}
+            class="mt-5 block font-mono text-sm text-[#d4e7f1]/60"
+          >
+            {formattedDate}
+          </time>
+          <p class="mt-5 text-[#d4e7f1]/75">{post.data.description}</p>
+        </header>
+
+        <div class="diary-content">
+          <Content />
+        </div>
+      </article>
+    </main>
+
+    <SiteFooter />
+  </body>
+</html>
+
+<style>
+  .diary-content :global(h2) {
+    margin-top: 1.5rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+  }
+
+  .diary-content :global(h3) {
+    margin-top: 1.5rem;
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+
+  .diary-content :global(h4) {
+    margin-top: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+
+  .diary-content :global(p),
+  .diary-content :global(ul),
+  .diary-content :global(ol) {
+    margin-top: 1.25rem;
+  }
+
+  .diary-content :global(a) {
+    color: #b494ff;
+    text-decoration: underline;
+  }
+
+  .diary-content :global(.url-card) {
+    display: flex;
+    margin-top: 1.5rem;
+    overflow: hidden;
+    border: 1px solid rgba(115, 125, 130, 0.3);
+    border-radius: 0.75rem;
+    background: #24242d;
+    color: #fff;
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .diary-content :global(.url-card:hover) {
+    transform: translateY(-2px);
+    border-color: rgba(180, 148, 255, 0.7);
+  }
+
+  .diary-content :global(.url-card__image) {
+    width: 10rem;
+    flex: 0 0 10rem;
+    background: #111;
+  }
+
+  .diary-content :global(.url-card__image img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .diary-content :global(.url-card__body) {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1rem;
+  }
+
+  .diary-content :global(.url-card__title) {
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .diary-content :global(.url-card__description) {
+    display: -webkit-box;
+    overflow: hidden;
+    color: rgba(212, 231, 241, 0.7);
+    font-size: 0.875rem;
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .diary-content :global(.url-card__meta) {
+    overflow: hidden;
+    color: rgba(212, 231, 241, 0.55);
+    font-family: monospace;
+    font-size: 0.75rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    .diary-content :global(.url-card__image) {
+      width: 7rem;
+      flex-basis: 7rem;
+    }
+  }
+
+  .diary-content :global(code) {
+    border-radius: 0.25rem;
+    background: #24242d;
+    padding: 0.125rem 0.375rem;
+  }
+
+  .diary-content :global(pre) {
+    margin-top: 1.5rem;
+    overflow-x: auto;
+    border-radius: 0.75rem;
+    background: #24242d;
+    padding: 1rem;
+  }
+</style>
