@@ -1,4 +1,5 @@
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 import { FEED_SOURCES } from './data/feeds';
 import { rssLoader } from './loaders/rssLoader';
 
@@ -18,6 +19,19 @@ const externalArticles = defineCollection({
   }),
 });
 
+const diary = defineCollection({
+  loader: glob({
+    base: './src/content/diary',
+    pattern: '**/*.md',
+  }),
+  schema: z.object({
+    title: z.string(),
+    pubDate: z.coerce.date(),
+    description: z.string(),
+  }),
+});
+
 export const collections = {
   externalArticles,
+  diary,
 };

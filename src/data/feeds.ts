@@ -1,11 +1,11 @@
-import type { PlatformType, PostContentType } from '../types/post';
+import type { ExternalContentType, PlatformType } from '../types/post';
 
 export interface FeedConfig {
   name: string;
   url: string;
   sourceUrl: string;
   platform: PlatformType;
-  contentType: PostContentType;
+  contentType: ExternalContentType;
 }
 
 export const FEED_SOURCES: FeedConfig[] = [

@@ -2,17 +2,17 @@
 import PostCard from './PostCard.astro';
 
 /**
- * @typedef {import('astro:content').CollectionEntry<'externalArticles'>} PostEntry
- */
-
-/**
  * @type {{
- *   posts: PostEntry[];
+ *   posts: import('../types/post').UnifiedPost[];
  *   initialCount?: number;
  *   incrementCount?: number;
  * }}
  */
-const { posts, initialCount = 24, incrementCount = 24 } = Astro.props;
+const {
+  posts,
+  initialCount = 24,
+  incrementCount = 24,
+} = Astro.props;
 const hasMore = posts.length > initialCount;
 ---
 

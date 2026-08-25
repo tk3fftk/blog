@@ -1,12 +1,8 @@
 ---
-/**
- * @typedef {import('astro:content').CollectionEntry<'externalArticles'>} PostEntry
- */
-
-/** @type {{ post: PostEntry }} */
+/** @type {{ post: import('../types/post').UnifiedPost }} */
 const { post } = Astro.props;
 const { title, url, pubDate, contentSnippet, sourceName, faviconUrl } =
-  post.data;
+  post;
 
 const formattedDate = new Intl.DateTimeFormat('ja-JP', {
   year: 'numeric',
