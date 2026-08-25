@@ -4,10 +4,13 @@ import { dirname, resolve } from 'node:path';
 import type { Loader } from 'astro/loaders';
 import Parser from 'rss-parser';
 import type { FeedConfig } from '../data/feeds';
+import type { ManualPostConfig } from '../data/manualPosts';
 import type { UnifiedPost } from '../types/post';
+import { fetchPageMetadata } from '../utils/pageMetadata';
 
 export interface RssLoaderOptions {
   feeds: FeedConfig[];
+  manualPosts?: ManualPostConfig[];
   snapshotFilePath?: string;
 }
 
@@ -62,7 +65,11 @@ function generateEntryId(url: string, platform: string): string {
 }
 
 export function rssLoader(options: RssLoaderOptions): Loader {
-  const { feeds, snapshotFilePath = 'src/data/posts-snapshot.json' } = options;
+  const {
+    feeds,
+    manualPosts = [],
+    snapshotFilePath = 'src/data/posts-snapshot.json',
+  } = options;
 
   return {
     name: 'rss-feed-loader',
@@ -90,6 +97,41 @@ export function rssLoader(options: RssLoaderOptions): Loader {
       }
 
       const initialCount = postMap.size;
+      let fetchedNewOrUpdatedCount = 0;
+
+      // A manual entry is controlled by its config rather than being an
+      // append-only RSS archive, so remove any URL no longer configured.
+      const configuredManualPosts = manualPosts.map((post) => {
+        const normalizedUrl = normalizeUrl(post.url);
+        const pubDate = new Date(post.pubDate);
+        try {
+          new URL(normalizedUrl);
+        } catch {
+          throw new Error(`Invalid manual post URL: ${post.url}`);
+        }
+        if (Number.isNaN(pubDate.getTime())) {
+          throw new Error(
+            `Invalid manual post publication date for ${post.url}: ${post.pubDate}`
+          );
+        }
+
+        return {
+          ...post,
+          url: normalizedUrl,
+          pubDate,
+          id: generateEntryId(normalizedUrl, 'custom'),
+        };
+      });
+      const configuredManualIds = new Set(
+        configuredManualPosts.map((post) => post.id)
+      );
+
+      for (const [id, post] of postMap) {
+        if (post.postType === 'manual' && !configuredManualIds.has(id)) {
+          postMap.delete(id);
+          fetchedNewOrUpdatedCount++;
+        }
+      }
 
       // 2. Fetch all configured live feeds concurrently
       logger.info(
@@ -115,8 +157,6 @@ export function rssLoader(options: RssLoaderOptions): Loader {
           }
         })
       );
-
-      let fetchedNewOrUpdatedCount = 0;
 
       // 3. Merge live feed items into postMap
       for (const result of feedResults) {
@@ -172,11 +212,95 @@ export function rssLoader(options: RssLoaderOptions): Loader {
         }
       }
 
+      // 4. Fetch configured manual pages. New entries must be readable so a
+      // typo cannot silently produce an incomplete deployment. Existing
+      // entries retain their snapshot data during transient remote failures.
+      const manualResults = await Promise.allSettled(
+        configuredManualPosts.map(async (manualPost) => ({
+          manualPost,
+          metadata: await fetchPageMetadata(manualPost.url),
+        }))
+      );
+
+      const failedNewManualPosts: string[] = [];
+      for (const result of manualResults) {
+        if (result.status === 'rejected') {
+          continue;
+        }
+
+        const { manualPost, metadata } = result.value;
+        const existing = postMap.get(manualPost.id);
+        const parsedUrl = new URL(manualPost.url);
+        const postData: UnifiedPost = {
+          id: manualPost.id,
+          title: metadata.title || existing?.title || parsedUrl.hostname,
+          url: manualPost.url,
+          pubDate: manualPost.pubDate,
+          contentSnippet: metadata.description || existing?.contentSnippet,
+          postType: 'manual',
+          contentType: manualPost.contentType,
+          platform: 'custom',
+          sourceName: parsedUrl.hostname,
+          sourceUrl: parsedUrl.origin,
+          faviconUrl: getFaviconUrl(manualPost.url),
+        };
+
+        if (
+          !existing ||
+          JSON.stringify({
+            ...existing,
+            pubDate: existing.pubDate.toISOString(),
+          }) !==
+            JSON.stringify({
+              ...postData,
+              pubDate: postData.pubDate.toISOString(),
+            })
+        ) {
+          postMap.set(manualPost.id, postData);
+          fetchedNewOrUpdatedCount++;
+        }
+      }
+
+      for (let index = 0; index < manualResults.length; index++) {
+        const result = manualResults[index];
+        if (result.status !== 'rejected') continue;
+
+        const manualPost = configuredManualPosts[index];
+        const message =
+          result.reason instanceof Error
+            ? result.reason.message
+            : String(result.reason);
+        if (postMap.has(manualPost.id)) {
+          const existing = postMap.get(manualPost.id);
+          if (
+            existing &&
+            existing.pubDate.getTime() !== manualPost.pubDate.getTime()
+          ) {
+            postMap.set(manualPost.id, {
+              ...existing,
+              pubDate: manualPost.pubDate,
+            });
+            fetchedNewOrUpdatedCount++;
+          }
+          logger.warn(
+            `Failed to refresh manual post (${manualPost.url}); using snapshot: ${message}`
+          );
+        } else {
+          failedNewManualPosts.push(`${manualPost.url}: ${message}`);
+        }
+      }
+
+      if (failedNewManualPosts.length > 0) {
+        throw new Error(
+          `Failed to fetch new manual post(s): ${failedNewManualPosts.join('; ')}`
+        );
+      }
+
       const allPosts = Array.from(postMap.values()).sort(
         (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
       );
 
-      // 4. Save updated snapshot if new items or updates occurred, or snapshot did not exist
+      // 5. Save updated snapshot if new items or updates occurred, or snapshot did not exist
       if (fetchedNewOrUpdatedCount > 0 || initialCount === 0) {
         try {
           await mkdir(dirname(snapshotPath), { recursive: true });
@@ -192,7 +316,7 @@ export function rssLoader(options: RssLoaderOptions): Loader {
         }
       }
 
-      // 5. Store all merged posts in Astro Content Layer Data Store
+      // 6. Store all merged posts in Astro Content Layer Data Store
       for (const post of allPosts) {
         const parsed = await parseData({
           id: post.id,
