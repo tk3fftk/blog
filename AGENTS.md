@@ -10,6 +10,10 @@ Manage the background server with `astro dev stop`, `astro dev status`, and `ast
 
 Write plan files under `./docs/plans`.
 
+For every implementation task, create or update a corresponding plan file in
+`./docs/plans` so that the implemented design, configuration, and verification
+steps are documented alongside the code changes.
+
 ## Documentation
 
 Full documentation: https://docs.astro.build
