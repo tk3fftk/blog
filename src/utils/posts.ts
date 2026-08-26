@@ -15,7 +15,7 @@ function toDiaryPost({ id, data }: DiaryEntry): UnifiedPost {
     contentType: 'diary',
     platform: 'custom',
     sourceName: 'diary',
-    faviconUrl: '/favicon.svg',
+    faviconUrl: '/favicon.png',
   };
 }
 
