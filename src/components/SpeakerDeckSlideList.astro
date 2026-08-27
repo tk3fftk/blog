@@ -1,0 +1,102 @@
+---
+/** @type {{ posts: import('../types/post').UnifiedPost[] }} */
+const { posts } = Astro.props;
+
+function getSpeakerDeckPlayerUrl(html) {
+  const srcMatch = html.match(/<iframe\b[^>]*\bsrc=(["'])(.*?)\1/i);
+  if (!srcMatch) return null;
+
+  try {
+    const playerUrl = new URL(srcMatch[2]);
+    const isValidPlayerUrl =
+      playerUrl.protocol === 'https:' &&
+      playerUrl.hostname === 'speakerdeck.com' &&
+      /^\/player\/[a-z0-9]+$/i.test(playerUrl.pathname) &&
+      !playerUrl.search &&
+      !playerUrl.hash &&
+      !playerUrl.username &&
+      !playerUrl.password;
+
+    return isValidPlayerUrl ? playerUrl.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
+const embeds = await Promise.all(
+  posts.map(async (post) => {
+    try {
+      const oembedUrl = `https://speakerdeck.com/oembed.json?url=${encodeURIComponent(post.url)}`;
+      const response = await fetch(oembedUrl);
+
+      if (!response.ok) {
+        throw new Error(`oEmbed request failed with status ${response.status}`);
+      }
+
+      const data = await response.json();
+      if (typeof data.html !== 'string') {
+        throw new Error('oEmbed response did not include iframe HTML');
+      }
+
+      const embedUrl = getSpeakerDeckPlayerUrl(data.html);
+      if (!embedUrl) {
+        throw new Error('oEmbed response did not include a valid player URL');
+      }
+
+      return { post, embedUrl };
+    } catch (error) {
+      console.warn(
+        `Failed to fetch Speaker Deck oEmbed for ${post.url}:`,
+        error
+      );
+      return { post };
+    }
+  })
+);
+---
+
+{
+  embeds.length === 0 ? (
+    <div class="py-20 text-center text-lg font-medium text-[#d4e7f1]/60">
+      No slides yet
+    </div>
+  ) : (
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+      {embeds.map(({ post, embedUrl }) => (
+        <article class="rounded-xl border border-[#737d82]/20 bg-[#24242d] p-4 sm:p-5">
+          <h2 class="line-clamp-2 min-h-[44px] text-base leading-snug font-medium text-white">
+            <a
+              href={post.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="transition-colors hover:text-[#b494ff] focus:outline-none focus-visible:text-[#b494ff]"
+            >
+              {post.title}
+            </a>
+          </h2>
+          {embedUrl ? (
+            <div class="mt-4 overflow-hidden rounded-lg bg-black">
+              <iframe
+                src={embedUrl}
+                title={`Speaker Deck: ${post.title}`}
+                width="710"
+                height="399"
+                loading="lazy"
+                frameborder="0"
+                allowtransparency="true"
+                allowfullscreen
+                class="block h-auto w-full"
+                style="aspect-ratio: 710 / 399; border: 0; padding: 0; margin: 0; background: transparent;"
+              />
+            </div>
+          ) : (
+            <p class="mt-4 text-sm text-[#d4e7f1]/60">
+              スライドを読み込めませんでした。上のリンクから Speaker Deck
+              でご覧ください。
+            </p>
+          )}
+        </article>
+      ))}
+    </div>
+  )
+}
