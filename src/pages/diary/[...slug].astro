@@ -94,6 +94,36 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
     margin-top: 1.25rem;
   }
 
+  .diary-content :global(ul) {
+    padding-left: 1.5rem;
+    list-style: disc;
+  }
+
+  .diary-content :global(ol) {
+    padding-left: 1.5rem;
+    list-style: decimal;
+  }
+
+  .diary-content :global(ul ul) {
+    list-style: circle;
+  }
+
+  .diary-content :global(li > ul),
+  .diary-content :global(li > ol) {
+    margin-top: 0.25rem;
+  }
+
+  .diary-content :global(blockquote) {
+    margin-top: 1.25rem;
+    border-left: 4px solid rgba(180, 148, 255, 0.6);
+    padding: 0.25rem 0 0.25rem 1rem;
+    color: var(--color-base-text-lighter);
+  }
+
+  .diary-content :global(blockquote > :first-child) {
+    margin-top: 0;
+  }
+
   .diary-content :global(a) {
     color: #b494ff;
     text-decoration: underline;
