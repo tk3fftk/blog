@@ -15,7 +15,8 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content } = await render(post);
+const { Content, headings } = await render(post);
+const tocHeadings = headings.filter(({ depth }) => depth === 2 || depth === 3);
 const formattedDate = new Intl.DateTimeFormat('ja-JP', {
   year: 'numeric',
   month: '2-digit',
@@ -59,6 +60,21 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
           <p class="mt-5 text-[#d4e7f1]/75">{post.data.description}</p>
         </header>
 
+        {tocHeadings.length > 0 && (
+          <details class="diary-toc">
+            <summary>目次</summary>
+            <nav aria-label="目次">
+              <ul>
+                {tocHeadings.map((heading) => (
+                  <li class:list={[heading.depth === 3 && 'diary-toc__nested']}>
+                    <a href={`#${heading.slug}`}>{heading.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </details>
+        )}
+
         <div class="diary-content">
           <Content />
         </div>
@@ -70,6 +86,44 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
 </html>
 
 <style>
+  .diary-toc {
+    margin-top: 1.5rem;
+    background: var(--color-base-background-lighter);
+    padding: 1rem 1.25rem;
+    color: var(--color-base-text);
+  }
+
+  .diary-toc summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+
+  .diary-toc nav {
+    margin-top: 0.5rem;
+  }
+
+  .diary-toc ul {
+    display: grid;
+    gap: 0.25rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .diary-toc__nested {
+    margin-left: 0.75rem;
+    list-style: circle;
+  }
+
+  .diary-toc a {
+    color: var(--color-primary-text);
+    text-decoration: none;
+    text-underline-offset: 0.2em;
+  }
+
+  .diary-toc a:hover {
+    text-decoration: underline;
+  }
+
   .diary-content :global(h2) {
     margin-top: 1.5rem;
     font-size: 1.5rem;
