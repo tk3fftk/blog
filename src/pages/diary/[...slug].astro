@@ -38,12 +38,18 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
     <title>{post.data.title} | {siteConfig.siteTitle}</title>
     <meta name="description" content={post.data.description} />
     <meta property="og:type" content="article" />
-    <meta property="og:title" content={`${post.data.title} | ${siteConfig.siteTitle}`} />
+    <meta
+      property="og:title"
+      content={`${post.data.title} | ${siteConfig.siteTitle}`}
+    />
     <meta property="og:description" content={post.data.description} />
     <meta property="og:image" content={ogImageUrl.href} />
     <meta property="og:url" content={pageUrl.href} />
     <meta name="twitter:card" content="summary" />
-    <meta name="twitter:title" content={`${post.data.title} | ${siteConfig.siteTitle}`} />
+    <meta
+      name="twitter:title"
+      content={`${post.data.title} | ${siteConfig.siteTitle}`}
+    />
     <meta name="twitter:description" content={post.data.description} />
     <meta name="twitter:image" content={ogImageUrl.href} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
