@@ -1,5 +1,18 @@
 [
   {
+    "id": "zenn-2443fc34b860e7b6",
+    "title": "ホンマでっかSRE勉強会 #2を開催しました！",
+    "url": "https://zenn.dev/tk3fftk/articles/1f85c78bbcaf72",
+    "pubDate": "2026-08-31T01:00:00.000Z",
+    "contentSnippet": "はじめに 無事にホンマでっかSRE勉強会の第2回を開催できたので、今回も開催レポートを簡単にではありますがお届けしたいと思います! https://honmadekka.connpass.com/event/402696/ 東京・関西双方に拠点がある企業の方々が、この勉強会を東西交流のきっかけのひとつとして利用してくださっているケースもちらほらあり、開催側としては嬉しい限りです🙏 次回は10/2",
+    "postType": "external",
+    "contentType": "article",
+    "platform": "zenn",
+    "sourceName": "Zenn",
+    "sourceUrl": "https://zenn.dev/tk3fftk",
+    "faviconUrl": "https://www.google.com/s2/favicons?sz=32&domain_url=https%3A%2F%2Fzenn.dev"
+  },
+  {
     "id": "zenn-45d53de5c6e1252b",
     "title": "NAT GWを使えないおれたちのための、NATインスタンス冗長化パターン3選",
     "url": "https://zenn.dev/primenumber/articles/b9dc8fb2f1f7ea",
