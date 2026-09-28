@@ -9,6 +9,8 @@ import remarkUrlCard from './src/plugins/remark-url-card.mjs';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://tk3fftk.dev',
+
   markdown: {
     processor: unified({
       remarkPlugins: [remarkUrlCard],

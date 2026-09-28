@@ -16,6 +16,8 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
+const pageUrl = new URL(Astro.url.pathname, Astro.site);
+const ogImageUrl = new URL('/avatar.jpg', Astro.site);
 const tocHeadings = headings.filter(({ depth }) => depth === 2 || depth === 3);
 const formattedDate = new Intl.DateTimeFormat('ja-JP', {
   year: 'numeric',
@@ -35,6 +37,15 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
     <meta name="generator" content={Astro.generator} />
     <title>{post.data.title} | {siteConfig.siteTitle}</title>
     <meta name="description" content={post.data.description} />
+    <meta property="og:type" content="article" />
+    <meta property="og:title" content={`${post.data.title} | ${siteConfig.siteTitle}`} />
+    <meta property="og:description" content={post.data.description} />
+    <meta property="og:image" content={ogImageUrl.href} />
+    <meta property="og:url" content={pageUrl.href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={`${post.data.title} | ${siteConfig.siteTitle}`} />
+    <meta name="twitter:description" content={post.data.description} />
+    <meta name="twitter:image" content={ogImageUrl.href} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
