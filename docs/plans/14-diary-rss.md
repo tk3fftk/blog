@@ -25,3 +25,12 @@
 - `/diary/rss.xml` は HTTP 200 / `application/xml`。トップ、diary 一覧、article 一覧、diary 個別 2 ページの自動検出タグと `Diary RSS` リンクを確認した。
 - バックグラウンド開発サーバーを停止し、`astro dev status` で停止状態を確認した。
 - ビルド時に既存の外部記事取得が 1 件タイムアウトしたが、既存の snapshot フォールバックでビルドは成功し、diary RSS に影響はなかった。
+
+## CI の依存インストール修正
+
+- PR #20 の CI は pnpm 11.28.5 の `pnpm install --frozen-lockfile` で、公開後 3 日未満の `strnum@2.5.1` を拒否した。ローカル pnpm 10 の検証ではこのポリシー検証を確認できていなかった。
+- `fast-xml-parser@5.11.2` の依存条件 `strnum: ^2.4.2` を満たし、2026-08-14 公開の `strnum@2.4.2` に lockfile を修正する。integrity は npm レジストリの値と一致させる。
+- `minimumReleaseAge: 4320` と既存の例外設定を維持し、CI と同じ pnpm 11.28.5 でクリーンな依存インストールと公開日時ポリシーの検証を行う。
+- フォーマット、lint、ビルド、型チェックを再確認し、修正コミットを同じ PR ブランチに push して CI 結果を確認する。
+- 分離した検証ディレクトリで pnpm 11.28.5 の frozen-lockfile インストールが成功し、全 658 エントリの supply-chain policy 検証が通った。
+- Windows の CRLF と、通常ファイルとしてチェックアウトされた `CLAUDE.md` シンボリックリンクを除いた Linux 相当のファイル構成で、リポジトリ全体のフォーマット確認が成功した。lint、ビルド、型チェックも成功した。
