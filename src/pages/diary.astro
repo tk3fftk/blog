@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import PostListPage from '../components/PostListPage.astro';
+import { diaryFeed } from '../config/site';
 import { createUnifiedPosts } from '../utils/posts';
 
 const [externalArticles, diaryEntries] = await Promise.all([
@@ -16,4 +17,25 @@ const posts = createUnifiedPosts(externalArticles, diaryEntries).filter(
   title="Diary"
   description="Diary entries by Hiroki Takatsuka"
   posts={posts}
-/>
+>
+  <a
+    slot="heading-actions"
+    href={diaryFeed.path}
+    aria-label="Diary RSS"
+    title="Diary RSS"
+    class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-[#d4e7f1]/60 transition-colors hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b494ff]"
+  >
+    <svg
+      class="h-5 w-5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <circle cx="5" cy="19" r="1" fill="currentColor"></circle>
+      <path d="M4 11a9 9 0 0 1 9 9M4 4a16 16 0 0 1 16 16"></path>
+    </svg>
+  </a>
+</PostListPage>

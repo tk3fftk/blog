@@ -1,11 +1,10 @@
 ---
-import { diaryFeed, siteConfig } from '../config/site';
+import { siteConfig } from '../config/site';
 
 const navigationItems = [
   { href: '/article', label: 'Article' },
   { href: '/slide', label: 'Slide' },
   { href: '/diary', label: 'Diary' },
-  { href: diaryFeed.path, label: 'Diary RSS' },
   { href: '/profile', label: 'Profile' },
 ];
 const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
