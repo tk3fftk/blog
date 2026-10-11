@@ -30,3 +30,8 @@ export const siteConfig: SiteConfig = {
     github_repo: 'https://github.com/tk3fftk/blog',
   },
 };
+
+export const diaryFeed = {
+  title: `Diary | ${siteConfig.siteTitle}`,
+  path: '/diary/rss.xml',
+};
