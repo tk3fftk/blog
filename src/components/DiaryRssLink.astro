@@ -1,0 +1,10 @@
+---
+import { diaryFeed } from '../config/site';
+---
+
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={diaryFeed.title}
+  href={new URL(diaryFeed.path, Astro.site)}
+/>

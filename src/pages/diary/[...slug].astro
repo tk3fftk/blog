@@ -2,6 +2,7 @@
 import { getCollection, render } from 'astro:content';
 import SiteFooter from '../../components/SiteFooter.astro';
 import SiteHeader from '../../components/SiteHeader.astro';
+import DiaryRssLink from '../../components/DiaryRssLink.astro';
 import { siteConfig } from '../../config/site';
 import '../../styles/global.css';
 
@@ -35,6 +36,7 @@ const formattedDate = new Intl.DateTimeFormat('ja-JP', {
     <link rel="icon" type="image/png" href="/favicon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
+    <DiaryRssLink />
     <title>{post.data.title} | {siteConfig.siteTitle}</title>
     <meta name="description" content={post.data.description} />
     <meta property="og:type" content="article" />
