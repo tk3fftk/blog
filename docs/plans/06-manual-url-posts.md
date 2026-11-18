@@ -25,6 +25,11 @@ RSS を提供しない外部記事・スライドを設定ファイルから追�
 - `pnpm build`
 - Findy Tools と cdCon 2020 の公開日が、初回ビルド日時ではなく設定値になることを確認する。
 
+## PR #24 の CI 修正
+
+- sizu.me の公開日を `2024-05-04` に統一し、行末の空白を削除する。
+- Build Check と同じ順に、Node.js 24 と pnpm 11 でフォーマット、ESLint、ビルド、TypeScript を検証する。
+
 ## Assumptions
 
 - 手動投稿のタイトルと概要は設定で上書きせず、対象ページの HTML メタデータを利用する。
