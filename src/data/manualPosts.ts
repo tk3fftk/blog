@@ -11,7 +11,7 @@ export const MANUAL_ARTICLE_URLS: Record<string, string> = {
   'https://findy-tools.io/products/new-relic/4/350': '2024-12-19',
   'https://cdcon2020.sched.com/event/dpvl/case-study-how-yahoo-japan-uses-and-contributes-to-screwdriver-at-scale-hiroki-takatsuka-jithin-emmanuel-yahoo-japan':
     '2020-10-07',
-  'https://sizu.me/tktktktktktktk/posts/4e4r355ac4ui': '2024-5-4', 
+  'https://sizu.me/tktktktktktktk/posts/4e4r355ac4ui': '2024-05-04',
 };
 
 export interface ManualPostConfig {
