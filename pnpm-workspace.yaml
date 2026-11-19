@@ -5,5 +5,7 @@ allowBuilds:
 minimumReleaseAge: 4320 # 3 days in minutes
 minimumReleaseAgeExclude:
   - eslint@10.9.0
+overrides:
+  miniflare@5.20260820.0-alpha>sharp: 0.35.5
 packages:
   - '.'
