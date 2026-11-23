@@ -7,3 +7,5 @@ Dependabot の設定形式はバージョン 2 とする。ルートにある `p
 ## 検証
 
 Ruby の `YAML.safe_load` で `.github/dependabot.yml` を読み込み、構文を検証した。解析結果を期待値と照合し、バージョンが整数の 2 で、更新設定が上記の 1 件であることを確認した。
+
+`.github/dependabot.yml` を Prettier で整形し、`prettier --check` が通ることを確認した。
